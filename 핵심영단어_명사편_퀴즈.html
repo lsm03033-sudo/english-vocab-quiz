@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2457a6">
+<title>핵심 영단어 - 명사편</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;background:#f5f7fb;color:#18212f}
+.app{max-width:520px;margin:auto;min-height:100dvh;padding:18px 16px 32px}
+header{padding:8px 2px 18px}.eyebrow{font-size:13px;color:#2457a6;font-weight:800;letter-spacing:.08em}.title{font-size:28px;font-weight:900;margin:5px 0}.sub{color:#687386;font-size:14px}
+.card{background:#fff;border-radius:22px;padding:20px;box-shadow:0 7px 28px rgba(25,40,70,.08);margin-bottom:14px}
+button,select{font:inherit}.btn{width:100%;border:0;border-radius:14px;padding:15px 14px;font-weight:800;cursor:pointer}.primary{background:#2457a6;color:white}.secondary{background:#edf2fa;color:#2457a6}.ghost{background:transparent;color:#5e6b7e;border:1px solid #dbe2ec}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.row{display:flex;gap:8px;align-items:center}.row>*{flex:1}
+.stat{font-size:12px;color:#6c788a}.bigstat{font-size:24px;font-weight:900;margin-top:3px}
+.progress{height:8px;background:#e8edf5;border-radius:99px;overflow:hidden;margin:12px 0 18px}.bar{height:100%;background:#2457a6;width:0%;transition:.25s}
+.quiz-top{display:flex;justify-content:space-between;align-items:center;color:#6c788a;font-size:13px}.num{font-weight:800;color:#2457a6}
+.question{min-height:170px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}.word{font-size:38px;font-weight:900;letter-spacing:-.02em}.meaning{font-size:25px;font-weight:900;line-height:1.35}
+.options{display:grid;gap:10px}.option{background:#fff;border:2px solid #e1e7f0;border-radius:15px;padding:15px;text-align:left;font-size:16px;font-weight:700;cursor:pointer}.option:active{transform:scale(.99)}.option.correct{border-color:#2c9b68;background:#edf9f3}.option.wrong{border-color:#dc5b5b;background:#fff0f0}.feedback{font-size:14px;margin-top:10px;color:#566276;text-align:center;min-height:20px}
+.toolbar{display:flex;gap:8px;overflow:auto;padding-bottom:3px}.chip{white-space:nowrap;border:1px solid #dbe2ec;background:white;border-radius:99px;padding:9px 12px;color:#5b687a;font-weight:700}.chip.active{background:#2457a6;color:#fff;border-color:#2457a6}
+.hidden{display:none!important}.list{max-height:60vh;overflow:auto}.item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #edf0f4}.item:last-child{border:0}.no{width:34px;color:#9aa5b5;font-size:12px;padding-top:3px}.item b{font-size:17px}.item span{display:block;color:#687386;margin-top:3px;font-size:14px}.wrongmark{margin-left:auto;color:#d65353;font-size:12px;font-weight:800}
+label{font-size:13px;font-weight:800;color:#596679;display:block;margin-bottom:7px}.select{width:100%;padding:13px;border:1px solid #dbe2ec;border-radius:12px;background:white}
+.result{text-align:center}.score{font-size:52px;font-weight:950;color:#2457a6}.muted{color:#748094}
+@media(min-width:700px){body{padding:24px}.app{min-height:auto}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+<div class="eyebrow">KESSAM · 핵심 영단어</div>
+<div class="title">명사편 단어 퀴즈</div>
+<div class="sub">PDF의 224개 단어를 휴대폰에서 바로 학습</div>
+</header>
+
+<section id="home">
+<div class="card">
+<div class="grid">
+<div><div class="stat">전체 단어</div><div class="bigstat">224</div></div>
+<div><div class="stat">누적 정답률</div><div class="bigstat" id="homeRate">0%</div></div>
+</div>
+</div>
+<div class="card">
+<label>출제 방향</label>
+<select id="direction" class="select">
+<option value="enko">영어 → 뜻</option>
+<option value="koen">뜻 → 영어</option>
+</select>
+<br><br>
+<label>문제 수</label>
+<select id="count" class="select">
+<option value="10">10문제</option><option value="20">20문제</option><option value="30">30문제</option>
+<option value="50">50문제</option><option value="all">전체 224문제</option>
+</select>
+<br><br>
+<div class="grid">
+<button class="btn primary" onclick="startQuiz(false)">퀴즈 시작</button>
+<button class="btn secondary" onclick="startQuiz(true)">틀린 단어</button>
+</div>
+</div>
+<div class="card">
+<div class="toolbar">
+<button class="chip active" id="tabStudy" onclick="showTab('study')">단어장</button>
+<button class="chip" id="tabWrong" onclick="showTab('wrong')">틀린 단어</button>
+</div>
+<div id="studyList" class="list"></div>
+<div id="wrongList" class="list hidden"></div>
+</div>
+<div class="card">
+<button class="btn ghost" onclick="resetStats()">학습 기록 초기화</button>
+</div>
+</section>
+
+<section id="quiz" class="hidden">
+<div class="card">
+<div class="quiz-top"><span id="qCount">1 / 10</span><span class="num" id="qNo">No.1</span></div>
+<div class="progress"><div class="bar" id="bar"></div></div>
+<div class="question" id="question"></div>
+<div class="options" id="options"></div>
+<div class="feedback" id="feedback"></div>
+</div>
+<button class="btn ghost" id="quitBtn" onclick="goHome()">퀴즈 종료</button>
+</section>
+
+<section id="result" class="hidden">
+<div class="card result">
+<div class="stat">QUIZ RESULT</div>
+<div class="score" id="score">0 / 0</div>
+<div id="resultText" class="muted"></div>
+<br>
+<button class="btn primary" onclick="goHome()">홈으로</button>
+</div>
+<div class="card">
+<button class="btn secondary" onclick="startQuiz(false)">다시 풀기</button>
+</div>
+</section>
+</div>
+
+<script>
+const WORDS = [{"no": 1, "word": "adult", "meaning": "성인"}, {"no": 2, "word": "infant", "meaning": "유아"}, {"no": 3, "word": "citizen", "meaning": "시민"}, {"no": 4, "word": "neighbor", "meaning": "이웃, 이웃 사람"}, {"no": 5, "word": "slave", "meaning": "노예"}, {"no": 6, "word": "trust", "meaning": "믿음, 신뢰"}, {"no": 7, "word": "immigrant", "meaning": "이민자"}, {"no": 8, "word": "race", "meaning": "인종, 종족, 혈통 / 경주"}, {"no": 9, "word": "audience", "meaning": "관중"}, {"no": 10, "word": "union", "meaning": "조합, 노동조합"}, {"no": 11, "word": "crowd", "meaning": "군중, 사람의 무리, 대중"}, {"no": 12, "word": "pack", "meaning": "무리, 떼"}, {"no": 13, "word": "existence", "meaning": "존재"}, {"no": 14, "word": "beast", "meaning": "짐승, 야수"}, {"no": 15, "word": "mammal", "meaning": "포유류"}, {"no": 16, "word": "insect", "meaning": "곤충, 벌레"}, {"no": 17, "word": "plant", "meaning": "식물 / 공장"}, {"no": 18, "word": "root", "meaning": "뿌리"}, {"no": 19, "word": "wheat", "meaning": "밀"}, {"no": 20, "word": "grain", "meaning": "곡물, 낟알"}, {"no": 21, "word": "organ", "meaning": "기관, 장기"}, {"no": 22, "word": "cell", "meaning": "세포 / 독방"}, {"no": 23, "word": "gene", "meaning": "유전자"}, {"no": 24, "word": "blood", "meaning": "피, 혈액 / 혈통"}, {"no": 25, "word": "tongue", "meaning": "혀 / 말, 언어"}, {"no": 26, "word": "brain", "meaning": "뇌"}, {"no": 27, "word": "heart", "meaning": "심장, 가슴 / 마음"}, {"no": 28, "word": "taste", "meaning": "맛 / 기호, 취향"}, {"no": 29, "word": "pain", "meaning": "고통, 통증"}, {"no": 30, "word": "feeling", "meaning": "감정, 느낌"}, {"no": 31, "word": "passion", "meaning": "열정, 열의"}, {"no": 32, "word": "temper", "meaning": "성질, 성미, 기질"}, {"no": 33, "word": "fear", "meaning": "공포, 두려움"}, {"no": 34, "word": "shame", "meaning": "수치심, 부끄러움"}, {"no": 35, "word": "curiosity", "meaning": "호기심"}, {"no": 36, "word": "concern", "meaning": "걱정 / 관심사"}, {"no": 37, "word": "courage", "meaning": "용기"}, {"no": 38, "word": "frustration", "meaning": "좌절감, 불만"}, {"no": 39, "word": "desire", "meaning": "욕구, 욕망"}, {"no": 40, "word": "appetite", "meaning": "식욕"}, {"no": 41, "word": "thirst", "meaning": "갈증 / 갈망"}, {"no": 42, "word": "concept", "meaning": "개념"}, {"no": 43, "word": "image", "meaning": "이미지"}, {"no": 44, "word": "opinion", "meaning": "의견, 견해"}, {"no": 45, "word": "policy", "meaning": "정책"}, {"no": 46, "word": "belief", "meaning": "믿음, 신념"}, {"no": 47, "word": "religion", "meaning": "종교, 신앙"}, {"no": 48, "word": "confidence", "meaning": "자신감 / 신뢰"}, {"no": 49, "word": "credit", "meaning": "신용도 / 신용 거래"}, {"no": 50, "word": "scene", "meaning": "경치, 풍경 / 현장, 장면"}, {"no": 51, "word": "ability", "meaning": "능력, 재능"}, {"no": 52, "word": "gift", "meaning": "선물 / 재능"}, {"no": 53, "word": "genius", "meaning": "천재, 귀재"}, {"no": 54, "word": "instinct", "meaning": "본능"}, {"no": 55, "word": "insight", "meaning": "통찰력, 안목"}, {"no": 56, "word": "skill", "meaning": "숙련, 기술, 기량"}, {"no": 57, "word": "area", "meaning": "지역 / 분야, 영역"}, {"no": 58, "word": "territory", "meaning": "영토, 지역"}, {"no": 59, "word": "field", "meaning": "들판, 밭 / 분야"}, {"no": 60, "word": "range", "meaning": "범위, 구역"}, {"no": 61, "word": "volcano", "meaning": "화산"}, {"no": 62, "word": "cliff", "meaning": "절벽"}, {"no": 63, "word": "glacier", "meaning": "빙하"}, {"no": 64, "word": "continent", "meaning": "대륙"}, {"no": 65, "word": "stream", "meaning": "개울, 시내 / 줄, 흐름"}, {"no": 66, "word": "cave", "meaning": "동굴"}, {"no": 67, "word": "country", "meaning": "나라 / 시골"}, {"no": 68, "word": "colony", "meaning": "식민지 / 동식물의 군집"}, {"no": 69, "word": "earth", "meaning": "지구, 세상 / 땅, 흙"}, {"no": 70, "word": "heaven", "meaning": "하늘, 하늘나라"}, {"no": 71, "word": "universe", "meaning": "우주"}, {"no": 72, "word": "surroundings", "meaning": "환경"}, {"no": 73, "word": "situation", "meaning": "상황, 처지, 환경"}, {"no": 74, "word": "position", "meaning": "위치 / 자세"}, {"no": 75, "word": "weather", "meaning": "날씨"}, {"no": 76, "word": "temperature", "meaning": "온도, 기온"}, {"no": 77, "word": "flood", "meaning": "홍수 / 범람, 쇄도"}, {"no": 78, "word": "pollution", "meaning": "오염"}, {"no": 79, "word": "energy", "meaning": "에너지, 정력, 활기"}, {"no": 80, "word": "fuel", "meaning": "연료"}, {"no": 81, "word": "resource", "meaning": "자원"}, {"no": 82, "word": "electricity", "meaning": "전기, 전력"}, {"no": 83, "word": "moisture", "meaning": "수분, 습기"}, {"no": 84, "word": "oxygen", "meaning": "산소"}, {"no": 85, "word": "protein", "meaning": "단백질"}, {"no": 86, "word": "bottom", "meaning": "바닥, 맨 아래 부분"}, {"no": 87, "word": "basis", "meaning": "기초, 근거, 이유"}, {"no": 88, "word": "reason", "meaning": "이유"}, {"no": 89, "word": "motive", "meaning": "동기"}, {"no": 90, "word": "source", "meaning": "원천, 근원"}, {"no": 91, "word": "border", "meaning": "국경, 경계, 가장자리"}, {"no": 92, "word": "defect", "meaning": "결함, 결점"}, {"no": 93, "word": "advantage", "meaning": "이점, 유리한 점"}, {"no": 94, "word": "disadvantage", "meaning": "불이익, 불리한 입장"}, {"no": 95, "word": "part", "meaning": "부분 / 부품 / 배역, 대사"}, {"no": 96, "word": "vice", "meaning": "악, 악행, 비행"}, {"no": 97, "word": "gesture", "meaning": "몸짓, 의사 표시"}, {"no": 98, "word": "murder", "meaning": "살인, 살인 사건"}, {"no": 99, "word": "violence", "meaning": "폭력, 격함, 맹렬함"}, {"no": 100, "word": "crime", "meaning": "죄, 범죄"}, {"no": 101, "word": "fight", "meaning": "싸움, 일거리"}, {"no": 102, "word": "competition", "meaning": "경쟁, 시합"}, {"no": 103, "word": "effort", "meaning": "노력"}, {"no": 104, "word": "job", "meaning": "일, 직업, 직장"}, {"no": 105, "word": "career", "meaning": "직업, 사회생활"}, {"no": 106, "word": "duty", "meaning": "의무, 직무"}, {"no": 107, "word": "labor", "meaning": "노동, 근로"}, {"no": 108, "word": "firm", "meaning": "회사"}, {"no": 109, "word": "office", "meaning": "사무실"}, {"no": 110, "word": "trade", "meaning": "무역, 거래, 상업"}, {"no": 111, "word": "enterprise", "meaning": "기업, 진취적 정신"}, {"no": 112, "word": "industry", "meaning": "산업 / 근면성"}, {"no": 113, "word": "opponent", "meaning": "상대, 반대자, 적"}, {"no": 114, "word": "candidate", "meaning": "지원자, 후보자"}, {"no": 115, "word": "soldier", "meaning": "군인, 병사"}, {"no": 116, "word": "diplomat", "meaning": "외교관"}, {"no": 117, "word": "minister", "meaning": "장관"}, {"no": 118, "word": "chairman", "meaning": "회장, 의장, 위원장"}, {"no": 119, "word": "architect", "meaning": "건축가"}, {"no": 120, "word": "victim", "meaning": "희생자, 피해자"}, {"no": 121, "word": "athlete", "meaning": "운동 선수"}, {"no": 122, "word": "client", "meaning": "고객, 의뢰인"}, {"no": 123, "word": "guest", "meaning": "손님"}, {"no": 124, "word": "expert", "meaning": "전문가, 달인"}, {"no": 125, "word": "tax", "meaning": "세금, 부담"}, {"no": 126, "word": "pension", "meaning": "연금"}, {"no": 127, "word": "insurance", "meaning": "보험"}, {"no": 128, "word": "currency", "meaning": "통화 / 유통, 통용"}, {"no": 129, "word": "income", "meaning": "수입, 소득"}, {"no": 130, "word": "fund", "meaning": "자금, 기금"}, {"no": 131, "word": "price", "meaning": "가격, 물가"}, {"no": 132, "word": "budget", "meaning": "예산"}, {"no": 133, "word": "revenue", "meaning": "수입"}, {"no": 134, "word": "wage", "meaning": "임금"}, {"no": 135, "word": "wealth", "meaning": "부, 재산"}, {"no": 136, "word": "finance", "meaning": "재정, 재무"}, {"no": 137, "word": "budget", "meaning": "예산"}, {"no": 138, "word": "fee", "meaning": "수수료 / 요금, 회비, 가입비"}, {"no": 139, "word": "debt", "meaning": "빚, 부채"}, {"no": 140, "word": "capital", "meaning": "수도 / 자본, 자본금"}, {"no": 141, "word": "society", "meaning": "사회, 집단"}, {"no": 142, "word": "government", "meaning": "정부, 정권"}, {"no": 143, "word": "revolution", "meaning": "혁명, 변혁"}, {"no": 144, "word": "evolution", "meaning": "진화"}, {"no": 145, "word": "progress", "meaning": "진전, 진척"}, {"no": 146, "word": "development", "meaning": "발전, 발달, 성장"}, {"no": 147, "word": "goal", "meaning": "목표 / 골, 득점"}, {"no": 148, "word": "target", "meaning": "표적, 목표"}, {"no": 149, "word": "destination", "meaning": "목적지, 도착지"}, {"no": 150, "word": "fate", "meaning": "운명"}, {"no": 151, "word": "plan", "meaning": "계획 / 도면, 약도"}, {"no": 152, "word": "design", "meaning": "디자인 / 설계도, 도안"}, {"no": 153, "word": "chance", "meaning": "기회 / 우연, 운"}, {"no": 154, "word": "accident", "meaning": "사고 / 우연"}, {"no": 155, "word": "result", "meaning": "결과"}, {"no": 156, "word": "effect", "meaning": "효과, 영향"}, {"no": 157, "word": "triumph", "meaning": "대승리, 대성공"}, {"no": 158, "word": "impact", "meaning": "강력한 영향, 충격"}, {"no": 159, "word": "element", "meaning": "요소, 성분"}, {"no": 160, "word": "problem", "meaning": "문제"}, {"no": 161, "word": "hardship", "meaning": "고난, 어려움, 곤란"}, {"no": 162, "word": "burden", "meaning": "(마음의) 무거운 짐, 부담"}, {"no": 163, "word": "danger", "meaning": "위험, 위협"}, {"no": 164, "word": "disaster", "meaning": "재앙, 대재해"}, {"no": 165, "word": "risk", "meaning": "위험"}, {"no": 166, "word": "crisis", "meaning": "위기"}, {"no": 167, "word": "amount", "meaning": "양, 액수"}, {"no": 168, "word": "sum", "meaning": "합계, 금액"}, {"no": 169, "word": "volume", "meaning": "음량, 부피, 용량"}, {"no": 170, "word": "degree", "meaning": "온도, 각도, 정도 / 학위"}, {"no": 171, "word": "scale", "meaning": "규모, 범위 / 저울"}, {"no": 172, "word": "level", "meaning": "정도, 수준"}, {"no": 173, "word": "rate", "meaning": "비율, 속도, 요금, 등급"}, {"no": 174, "word": "example", "meaning": "예, 모범"}, {"no": 175, "word": "lack", "meaning": "부족"}, {"no": 176, "word": "pattern", "meaning": "패턴, 무늬"}, {"no": 177, "word": "habit", "meaning": "습관"}, {"no": 178, "word": "custom", "meaning": "관습, 풍습"}, {"no": 179, "word": "category", "meaning": "카테고리, 범주, 분류"}, {"no": 180, "word": "rule", "meaning": "규칙 / 지배"}, {"no": 181, "word": "law", "meaning": "법"}, {"no": 182, "word": "contract", "meaning": "계약"}, {"no": 183, "word": "tradition", "meaning": "전통"}, {"no": 184, "word": "heritage", "meaning": "유산"}, {"no": 185, "word": "background", "meaning": "배경, 경력"}, {"no": 186, "word": "legend", "meaning": "전설"}, {"no": 187, "word": "poverty", "meaning": "가난, 빈곤"}, {"no": 188, "word": "disease", "meaning": "병, 질병"}, {"no": 189, "word": "reputation", "meaning": "평판, 명성"}, {"no": 190, "word": "honor", "meaning": "영광, 명예, 경의"}, {"no": 191, "word": "pride", "meaning": "자랑, 자만심, 자존심"}, {"no": 192, "word": "prize", "meaning": "상, 상금, 상품"}, {"no": 193, "word": "mathematics", "meaning": "수학"}, {"no": 194, "word": "philosophy", "meaning": "철학, 인생관"}, {"no": 195, "word": "chemistry", "meaning": "화학"}, {"no": 196, "word": "literature", "meaning": "문학, 문헌"}, {"no": 197, "word": "physics", "meaning": "물리학"}, {"no": 198, "word": "politics", "meaning": "정치, 정치학, 정책"}, {"no": 199, "word": "biology", "meaning": "생물학"}, {"no": 200, "word": "psychology", "meaning": "심리학, 심리"}, {"no": 201, "word": "interval", "meaning": "간격, 사이"}, {"no": 202, "word": "anniversary", "meaning": "기념일"}, {"no": 203, "word": "period", "meaning": "기간, 시기, 시대"}, {"no": 204, "word": "moment", "meaning": "순간"}, {"no": 205, "word": "means", "meaning": "수단, 방법 / 재력, 수입"}, {"no": 206, "word": "medium", "meaning": "수단, 매체"}, {"no": 207, "word": "vehicle", "meaning": "탈것, 수단"}, {"no": 208, "word": "attitude", "meaning": "태도, 자세"}, {"no": 209, "word": "access", "meaning": "접근"}, {"no": 210, "word": "fashion", "meaning": "패션, 유행"}, {"no": 211, "word": "approach", "meaning": "접근, 접근법"}, {"no": 212, "word": "tool", "meaning": "도구, 공구"}, {"no": 213, "word": "equipment", "meaning": "장비, 설비"}, {"no": 214, "word": "weapon", "meaning": "무기"}, {"no": 215, "word": "word", "meaning": "단어, 말, 약속"}, {"no": 216, "word": "letter", "meaning": "편지, 문자, 문학"}, {"no": 217, "word": "vocabulary", "meaning": "어휘, 단어집"}, {"no": 218, "word": "conversation", "meaning": "대화, 회화"}, {"no": 219, "word": "conclusion", "meaning": "결론"}, {"no": 220, "word": "story", "meaning": "이야기"}, {"no": 221, "word": "cartoon", "meaning": "만화, 만화 영화"}, {"no": 222, "word": "tragedy", "meaning": "비극, 불행한 일"}, {"no": 223, "word": "comedy", "meaning": "희극, 코미디"}, {"no": 224, "word": "rumor", "meaning": "소문"}];
+let stats = JSON.parse(localStorage.getItem('vocabStats')||'{}');
+let quiz=[], idx=0, correct=0, answered=false, wrongInQuiz=[];
+
+function save(){localStorage.setItem('vocabStats',JSON.stringify(stats));}
+function shuffle(a){return [...a].sort(()=>Math.random()-.5)}
+function normalize(s){return s.replace(/\s+/g,'').toLowerCase()}
+function rate(){
+ const vals=Object.values(stats); if(!vals.length)return 0;
+ const a=vals.reduce((x,v)=>x+v.c,0), b=vals.reduce((x,v)=>x+v.t,0);
+ return b?Math.round(a/b*100):0;
+}
+function renderHome(){
+ document.getElementById('homeRate').textContent=rate()+'%';
+ const list=document.getElementById('studyList');
+ list.innerHTML=WORDS.map(x=>`<div class="item"><div class="no">${x.no}</div><div><b>${x.word}</b><span>${x.meaning}</span></div>${stats[x.no]?.w?`<div class="wrongmark">${stats[x.no].w}회 오답</div>`:''}</div>`).join('');
+ renderWrong();
+}
+function renderWrong(){
+ const bad=WORDS.filter(x=>stats[x.no]?.w>0);
+ document.getElementById('wrongList').innerHTML=bad.length?bad.map(x=>`<div class="item"><div class="no">${x.no}</div><div><b>${x.word}</b><span>${x.meaning}</span></div><div class="wrongmark">${stats[x.no].w}회</div></div>`).join(''):'<div style="padding:28px 5px;text-align:center;color:#7b8798">아직 틀린 단어가 없어!</div>';
+}
+function showTab(t){
+ document.getElementById('studyList').classList.toggle('hidden',t!=='study');
+ document.getElementById('wrongList').classList.toggle('hidden',t!=='wrong');
+ document.getElementById('tabStudy').classList.toggle('active',t==='study');
+ document.getElementById('tabWrong').classList.toggle('active',t==='wrong');
+}
+function startQuiz(wrongOnly){
+ const direction=document.getElementById('direction').value;
+ let pool=wrongOnly?WORDS.filter(x=>stats[x.no]?.w>0):WORDS;
+ if(!pool.length){alert('틀린 단어가 아직 없어!');return}
+ let n=document.getElementById('count').value;
+ n=n==='all'?pool.length:Math.min(+n,pool.length);
+ quiz=shuffle(pool).slice(0,n); idx=0; correct=0; wrongInQuiz=[]; answered=false;
+ document.getElementById('home').classList.add('hidden');
+ document.getElementById('result').classList.add('hidden');
+ document.getElementById('quiz').classList.remove('hidden');
+ renderQuestion(direction);
+ window.scrollTo(0,0);
+}
+function renderQuestion(direction){
+ answered=false;
+ const x=quiz[idx];
+ document.getElementById('qCount').textContent=`${idx+1} / ${quiz.length}`;
+ document.getElementById('qNo').textContent=`No.${x.no}`;
+ document.getElementById('bar').style.width=(idx/quiz.length*100)+'%';
+ let prompt=direction==='enko'?`<div class="word">${x.word}</div>`:`<div class="meaning">${x.meaning}</div>`;
+ document.getElementById('question').innerHTML=prompt;
+ let pool=shuffle(WORDS.filter(y=>y.no!==x.no)).slice(0,3);
+ let opts=shuffle([x,...pool]);
+ document.getElementById('options').innerHTML=opts.map((o,i)=>{
+   let label=direction==='enko'?o.meaning:o.word;
+   return `<button class="option" data-no="${o.no}" onclick="answer(${o.no},this)">${String.fromCharCode(65+i)}. ${label}</button>`
+ }).join('');
+ document.getElementById('feedback').textContent='';
+}
+function answer(no,el){
+ if(answered)return;
+ answered=true;
+ const x=quiz[idx], ok=no===x.no;
+ stats[x.no]??={c:0,t:0,w:0};
+ stats[x.no].t++;
+ if(ok){correct++;stats[x.no].c++;el.classList.add('correct');document.getElementById('feedback').textContent='정답!';}
+ else{stats[x.no].w++;wrongInQuiz.push(x.no);el.classList.add('wrong');document.querySelector(`.option[data-no="${x.no}"]`).classList.add('correct');document.getElementById('feedback').textContent=`정답: ${x.word} — ${x.meaning}`;}
+ save();
+ setTimeout(()=>{
+   idx++;
+   if(idx<quiz.length) renderQuestion(document.getElementById('direction').value);
+   else finish();
+ },700);
+}
+function finish(){
+ document.getElementById('quiz').classList.add('hidden');
+ document.getElementById('result').classList.remove('hidden');
+ document.getElementById('score').textContent=`${correct} / ${quiz.length}`;
+ const pct=Math.round(correct/quiz.length*100);
+ document.getElementById('resultText').textContent=`정답률 ${pct}% · 오답 ${quiz.length-correct}개`;
+ renderHome();
+ window.scrollTo(0,0);
+}
+function goHome(){
+ document.getElementById('quiz').classList.add('hidden');
+ document.getElementById('result').classList.add('hidden');
+ document.getElementById('home').classList.remove('hidden');
+ renderHome();window.scrollTo(0,0);
+}
+function resetStats(){
+ if(confirm('모든 학습 기록을 삭제할까요?')){stats={};save();renderHome();}
+}
+renderHome();
+</script>
+</body>
+</html>
